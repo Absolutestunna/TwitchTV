@@ -13,7 +13,9 @@ myApp.controller('TwitchCtrl', ["$scope", "$http", function($scope, $http){
     "Sensei_wu2",
     "OnExFpS",
     "aloysia_",
-    "MrTyghf"
+    "MrTyghf",
+    'brunofin',
+    'comster404'
   ];
   $scope.offline_users = [];
   $scope.online_users = [];
@@ -32,27 +34,24 @@ myApp.controller('TwitchCtrl', ["$scope", "$http", function($scope, $http){
 
 
 // Second request to get the url for the offline users.
-          $http.get('https://api.twitch.tv/kraken/channels/storbeck').
+          $http.get('https://api.twitch.tv/kraken/channels/' + name).
            then(function successCallback(response) {
-            console.log('success chanel response is', response);
             offline_info.url = response.data.url;
-            console.log('offline info is: ', offline_info);
           }, function errorCallback(response) {
             console.log('error channel response is: ', response);
           });
 
 
 
+
           $scope.offline_users.push(offline_info);
-          console.log('offline users', $scope.offline_users);
         } else {
           $scope.online_users.push(data.stream);
-          console.log('online users', $scope.online_users);
         }
       }, function errorCallback(response) {
         console.log('error response is: ', response);
 
       });
-  });
+   });
 
 }]);
