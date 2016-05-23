@@ -17,41 +17,59 @@ myApp.controller('TwitchCtrl', ["$scope", "$http", function($scope, $http){
     'brunofin',
     'comster404'
   ];
-  $scope.offline_users = [];
-  $scope.online_users = [];
 
-  angular.forEach($scope.usernames, function(name, key){
-    $http.get('https://api.twitch.tv/kraken/streams/' + name).
-      then(function successCallback(response) {
-        console.log('response is', response);
-        var data = response.data;
-        if (data.stream === null) {
-          data.stream = "offline";
-          var offline_info = {
-            'name': name,
-            'status': data.stream
-          };
+  var usernames = $scope.usernames;
+
+  $scope.addUser = function(e){
+    if (e.which && e.which === 13){
+      usernames.push($scope.user);
+      $scope.tItem = "";
+      startForEach(usernames);
+    }
+  };
 
 
-// Second request to get the url for the offline users.
-          $http.get('https://api.twitch.tv/kraken/channels/' + name).
-           then(function successCallback(response) {
-            offline_info.url = response.data.url;
-          }, function errorCallback(response) {
-            console.log('error channel response is: ', response);
-          });
+  startForEach(usernames);
+  
+  function startForEach(usernames){
+
+    $scope.offline_users = [];
+    $scope.online_users = [];
+    $scope.inactive_users = [];
 
 
+    angular.forEach(usernames, function(name, key){
+      $http.get('https://api.twitch.tv/kraken/streams/' + name).
+        then(function successCallback(response) {
+          console.log('response is', response);
+          var data = response.data;
+          if (data.stream === null) {
+            data.stream = "offline";
+            var offline_info = {
+              'name': name,
+              'status': data.stream
+            };
 
 
-          $scope.offline_users.push(offline_info);
-        } else {
-          $scope.online_users.push(data.stream);
-        }
-      }, function errorCallback(response) {
-        console.log('error response is: ', response);
+    // Second request to get the url for the offline users.
+            $http.get('https://api.twitch.tv/kraken/channels/' + name).
+             then(function successCallback(response) {
+              offline_info.url = response.data.url;
+            }, function errorCallback(response) {
+              console.log('error channel response is: ', response);
+            });
+    //end of second api request
 
-      });
-   });
+            $scope.offline_users.push(offline_info);
+          } else {
+            $scope.online_users.push(data.stream);
+          }
+        }, function errorCallback(response) {
+          console.log('error response is: ', response);
+          $scope.inactive_users.push(name);
+
+        });
+     });
+  }
 
 }]);
